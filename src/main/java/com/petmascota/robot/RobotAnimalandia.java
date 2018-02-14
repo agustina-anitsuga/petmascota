@@ -1,8 +1,16 @@
 package com.petmascota.robot;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.petmascota.robot.model.Product;
+import com.petmascota.robot.page.AnimalandiaListingPage;
+import com.petmascota.robot.utils.Browser;
+import com.petmascota.robot.utils.SeleniumUtils;
 
 /**
  * RobotAnimalandia
@@ -11,9 +19,85 @@ import com.petmascota.robot.model.Product;
  */
 public class RobotAnimalandia implements Robot {
 
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(RobotAnimalandia.class.getName());
+    
+    /**
+     * scrape
+     */
     public List<Product> scrape() {
-        // TODO Auto-generated method stub
-        return null;
+
+        List<Product> ret = new ArrayList<Product>();
+
+        // Get required properties
+        Properties config = new Properties();
+        String dogsURL = config.getProperty("animalandia.url.dogs");
+        String catsURL = config.getProperty("animalandia.url.cats");
+        
+        // Scrape data
+        List<Product> dogsItems = scrape(dogsURL);
+        List<Product> catsItems = scrape(catsURL);
+        
+        // build output
+        ret.addAll(dogsItems);
+        ret.addAll(catsItems);
+        
+        return ret;
+    }
+
+    /**
+     * scrape
+     * @param dogsURL
+     * @return
+     */
+    private List<Product> scrape(String url) {
+        
+        WebDriver driver = null ;
+        List<Product> ret = new ArrayList<Product>();
+        String fullUrl = url;
+        
+        try {
+            driver = SeleniumUtils.buildDriver(Browser.CHROME);
+            AnimalandiaListingPage listingPage = new AnimalandiaListingPage(driver);
+            int productCount = 1;
+            int page = 0;
+            
+            while(productCount>0) 
+            {   
+                // open browser to requestes url
+                fullUrl = url+page+"/";
+                listingPage = listingPage.go(fullUrl);
+                productCount = listingPage.getProductCount();
+                LOGGER.info("Navigated to page: " +fullUrl + " ("+productCount+" products)");
+                
+                // if products are found
+                if( productCount>0 ){
+                    // get products in page
+                    List<Product> products = listingPage.getProducts();
+                    ret.addAll(products);
+                    page++;
+                }
+                
+            } 
+            
+            
+        } catch (Exception e) {
+            
+            // take screenshot of error
+            SeleniumUtils.captureScreenshot(driver);
+            
+            // log exception
+            LOGGER.error("Error reading URL "+fullUrl, e);
+            
+        } finally {
+            if (driver != null) {
+                driver.quit();
+            }
+        }
+        
+        return ret;
     }
 
 }
