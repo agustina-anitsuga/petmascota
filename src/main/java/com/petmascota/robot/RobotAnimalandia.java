@@ -7,7 +7,9 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.petmascota.robot.model.BrandLink;
 import com.petmascota.robot.model.Product;
+import com.petmascota.robot.page.AnimalandiaCategoryPage;
 import com.petmascota.robot.page.AnimalandiaListingPage;
 import com.petmascota.robot.utils.Browser;
 import com.petmascota.robot.utils.SeleniumUtils;
@@ -60,27 +62,27 @@ public class RobotAnimalandia implements Robot {
         
         try {
             driver = SeleniumUtils.buildDriver(Browser.CHROME);
-            AnimalandiaListingPage listingPage = new AnimalandiaListingPage(driver);
-            int productCount = 1;
+            AnimalandiaCategoryPage categoryPage = new AnimalandiaCategoryPage(driver);
             int page = 0;
             
-            while(productCount>0) 
-            {   
-                // open browser to requestes url
-                fullUrl = url+page+"/";
-                listingPage = listingPage.go(fullUrl);
-                productCount = listingPage.getProductCount();
-                LOGGER.info("Navigated to page: " +fullUrl + " ("+productCount+" products)");
+            // from parent url, extract brand links
+            fullUrl = url+page+"/";
+            categoryPage = categoryPage.go(fullUrl);
+            List<BrandLink> brandLinks = categoryPage.getBrandLinks();
+            
+            // for each brand, extract products
+            for (BrandLink brandLink : brandLinks) {
                 
-                // if products are found
-                if( productCount>0 ){
-                    // get products in page
-                    List<Product> products = listingPage.getProducts();
-                    ret.addAll(products);
-                    page++;
-                }
+                // build base path for category
+                String path = brandLink.getLink();
+                int indexLastSlash = path.indexOf("categoria/");
+                int indexLastCharacter = path.indexOf("/",indexLastSlash+11);
+                path = path.substring(0, indexLastCharacter+1);
                 
-            } 
+                // get products for selected category (brand)
+                List<Product> products = getProductsByBrand(path, brandLink.getBrand(), driver);
+                ret.addAll(products);
+            }
             
             
         } catch (Exception e) {
@@ -99,5 +101,46 @@ public class RobotAnimalandia implements Robot {
         
         return ret;
     }
+    
+    /**
+     * getProductsByBrand
+     * @param path
+     * @param brand
+     * @param source
+     * @return product list
+     */
+    private List<Product> getProductsByBrand( String path, String brand, WebDriver driver){
+        
+        AnimalandiaListingPage listingPage = null;
+        List<Product> ret = new ArrayList<Product>();
+        int productCount = 1;
+        int page = 0;
+        boolean flag = true;
+        
+        while(flag) 
+        {   
+            // open browser to requested url
+            String fullUrl = path+"pagina/"+page+"/";
+            listingPage = new AnimalandiaListingPage(driver).go(fullUrl);
+            productCount = listingPage.getProductCount();
+            LOGGER.info("Navigated to page: " +fullUrl + " ("+productCount+" products)");
+            
+            // if products are found
+            if( productCount>0 ){
+                // get products in page
+                List<Product> products = listingPage.getProducts(brand);
+                ret.addAll(products);
+                page++;
+            }
+            
+            if( productCount<9 ){
+                flag = false;
+            }
+            LOGGER.info("Read products in page: " +fullUrl + " ("+flag+")");
+            
+        } 
+        
+        return ret;
+    } 
 
 }

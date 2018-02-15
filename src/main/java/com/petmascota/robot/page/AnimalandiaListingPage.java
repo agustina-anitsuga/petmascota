@@ -30,23 +30,16 @@ public class AnimalandiaListingPage extends Page {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AnimalandiaListingPage.class.getName());
 
-    
     /**
      * products
      */
     @FindBy(xpath = ".//*/ul[contains(@class,\"thumbnails\")]/li")
     private List<WebElement> products;
-    
-    /**
-     * nextLink
-     */
-    @FindBy(xpath = "//*/div[contains(@class,\"pager bottom\")]/ul/li[contains(@class,\"next\")]")
-    private WebElement nextLink;
-    
+        
     
     
     /**
-     * ListingPagePuppis
+     * AnimalandiaListingPage
      * @param driver
      */
     public AnimalandiaListingPage(WebDriver driver) {
@@ -70,11 +63,11 @@ public class AnimalandiaListingPage extends Page {
      * getProducts
      * @return products
      */
-    public List<Product> getProducts() {
+    public List<Product> getProducts(String brand) {
         List<Product> ret = new ArrayList<Product>();
         for (int i = 0; i < products.size(); i++) {
             WebElement product = products.get(i);
-            List<Product> itemizedProducts = parseProducts(product);
+            List<Product> itemizedProducts = parseProducts(product,brand);
             ret.addAll(itemizedProducts);
         }
         return ret;
@@ -85,12 +78,13 @@ public class AnimalandiaListingPage extends Page {
      * @param webElement
      * @return
      */
-    private List<Product> parseProducts(WebElement product){
+    private List<Product> parseProducts(WebElement product,String brand){
         List<Product> ret = new ArrayList<Product>();
         
         try
         {
             Product p = new Product();
+            p.setBrand(brand);
             
             try {
             WebElement title = product.findElement(By.className("producto-descripcion-corta"));
@@ -127,8 +121,10 @@ public class AnimalandiaListingPage extends Page {
             if(promotionPrice!=null)
                 p.setPromotionPrice(promotionPrice.getText());
             
-            ret.add(p);
-        
+            if( !isNullContent(p) ){
+                ret.add(p);
+            }
+            
         } catch( Exception e2 ){
             
             LOGGER.error("Error parsing product");
@@ -136,6 +132,16 @@ public class AnimalandiaListingPage extends Page {
         }
         
         return ret;
+    }
+
+    /**
+     * isNullContent
+     * @param product
+     * @return
+     */
+    private boolean isNullContent(Product product) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     /**
@@ -151,5 +157,6 @@ public class AnimalandiaListingPage extends Page {
         }
         return products.size();
     }
+    
  
 }
