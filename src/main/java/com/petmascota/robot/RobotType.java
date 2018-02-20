@@ -31,6 +31,18 @@ public enum RobotType {
         }
     }, 
     
+    MARKETCAN {
+        @Override
+        public Robot getInstance() {
+            return new RobotMarketcan();
+        }
+        
+        @Override
+        public String getFilename() {
+            return "marketcan.csv";
+        }
+    },
+    
     TIMOTEO {
         @Override
         public Robot getInstance() {
