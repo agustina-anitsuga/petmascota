@@ -8,6 +8,7 @@ package com.petmascota.robot.model;
 public class Product {
 
     private String title ;
+    private String description;
     private String url ;
     private String regularPriceDesc ;
     private String regularPrice ;
@@ -64,6 +65,12 @@ public class Product {
     }
     public void setPromotionPriceDesc(String promotionPriceDesc) {
         this.promotionPriceDesc = promotionPriceDesc;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     public Object clone(){

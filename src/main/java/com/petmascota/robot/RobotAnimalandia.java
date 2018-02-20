@@ -67,8 +67,10 @@ public class RobotAnimalandia implements Robot {
             
             // from parent url, extract brand links
             fullUrl = url+page+"/";
+            LOGGER.info("Reading start category URL "+fullUrl);
             categoryPage = categoryPage.go(fullUrl);
             List<BrandLink> brandLinks = categoryPage.getBrandLinks();
+            LOGGER.info("Read brands "+brandLinks.size());
             
             // for each brand, extract products
             for (BrandLink brandLink : brandLinks) {
@@ -80,6 +82,7 @@ public class RobotAnimalandia implements Robot {
                 path = path.substring(0, indexLastCharacter+1);
                 
                 // get products for selected category (brand)
+                LOGGER.info("Reading products from brand "+brandLink.getBrand());
                 List<Product> products = getProductsByBrand(path, brandLink.getBrand(), driver);
                 ret.addAll(products);
             }
@@ -122,21 +125,31 @@ public class RobotAnimalandia implements Robot {
             // open browser to requested url
             String fullUrl = path+"pagina/"+page+"/";
             listingPage = new AnimalandiaListingPage(driver).go(fullUrl);
-            productCount = listingPage.getProductCount();
-            LOGGER.info("Navigated to page: " +fullUrl + " ("+productCount+" products)");
             
-            // if products are found
-            if( productCount>0 ){
-                // get products in page
-                List<Product> products = listingPage.getProducts(brand);
-                ret.addAll(products);
-                page++;
-            }
-            
-            if( productCount<9 ){
+            if( !listingPage.showsEmptyResult() )
+            {
+                productCount = listingPage.getProductCount();
+                LOGGER.info("Navigated to page: " +fullUrl + " ("+productCount+" products)");
+                
+                // if products are found
+                if( productCount>0 ){
+                    // get products in page
+                    List<Product> products = listingPage.getProducts(brand);
+                    ret.addAll(products);
+                    page++;
+                }
+                
+                if( productCount<9 ){
+                    flag = false;
+                }
+
+                LOGGER.info("Read products in page: " +fullUrl + " ("+flag+")");
+                
+            } else {
+                LOGGER.info("Could not read products in page: " +fullUrl + " ("+flag+")");
                 flag = false;
             }
-            LOGGER.info("Read products in page: " +fullUrl + " ("+flag+")");
+
             
         } 
         

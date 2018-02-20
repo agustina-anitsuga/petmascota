@@ -36,7 +36,11 @@ public class AnimalandiaListingPage extends Page {
     @FindBy(xpath = ".//*/ul[contains(@class,\"thumbnails\")]/li")
     private List<WebElement> products;
         
-    
+    /**
+     * emptyLabel
+     */
+    @FindBy(xpath = "//*[@id=,\"catalogo\"]/div[2]/div[2]/div[2]/div/div[3]/div[1]/span")
+    private WebElement emptyLabel;
     
     /**
      * AnimalandiaListingPage
@@ -87,16 +91,16 @@ public class AnimalandiaListingPage extends Page {
             p.setBrand(brand);
             
             try {
-            WebElement title = product.findElement(By.className("producto-descripcion-corta"));
-            p.setTitle(title.getText());
+            WebElement desc = product.findElement(By.className("producto-descripcion-corta"));
+            p.setDescription(desc.getText());
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(),(Object[])e.getStackTrace());
             }
             
             try {
-            WebElement size = product.findElement(By.className("btn-link"));
-            p.setSize(size.getText());
-            p.setUrl(size.getAttribute("href"));
+            WebElement title = product.findElement(By.className("btn-link"));
+            p.setTitle(title.getText());
+            p.setUrl(title.getAttribute("href"));
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(),(Object[])e.getStackTrace());
             }
@@ -156,6 +160,25 @@ public class AnimalandiaListingPage extends Page {
             LOGGER.debug(e.getMessage());
         }
         return products.size();
+    }
+
+    /**
+     * showsEmptyResult
+     * @return
+     */
+    public boolean showsEmptyResult() {
+        try {
+            WebDriverWait wait = SeleniumUtils.getWait(driver);
+
+            wait.until(ExpectedConditions.presenceOfElementLocated( By.xpath("//*[@id=,\"catalogo\"]/div[2]/div[2]/div[2]/div/div[3]/div[1]/span") ));
+            
+            String text = emptyLabel.getText();
+            
+            return text.startsWith("No se encontraron");
+        } catch ( Exception e ){
+            LOGGER.debug(e.getMessage());
+        }
+        return false;
     }
     
  

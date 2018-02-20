@@ -20,7 +20,7 @@
 
 #Output files
 *.csv
-/output/
+/output/*.jpg
 
 #Project files
 .project

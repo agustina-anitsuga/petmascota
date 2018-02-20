@@ -46,11 +46,12 @@ public class ProductCSVWriter {
             
             out = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 
-            out.println("Brand,Title,Size,RegularPriceDesc,RegularPrice,PromotionPriceDesc,PromotionPrice,URL");
+            out.println("Brand,Title,Description,Size,RegularPriceDesc,RegularPrice,PromotionPriceDesc,PromotionPrice,URL");
             
             for (Product product : products) {
                 String data = QUOTES+product.getBrand()+QUOTES+DELIMITER+
                         QUOTES+product.getTitle()+QUOTES+DELIMITER+
+                        QUOTES+product.getDescription()+QUOTES+DELIMITER+
                         QUOTES+product.getSize()+QUOTES+DELIMITER+
                         QUOTES+product.getRegularPriceDesc()+QUOTES+DELIMITER+
                         QUOTES+product.getRegularPrice()+QUOTES+DELIMITER+

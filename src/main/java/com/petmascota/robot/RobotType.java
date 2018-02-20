@@ -15,7 +15,7 @@ public enum RobotType {
 
         @Override
         public String getFilename() {
-            return "puppis.csv";
+            return "output/puppis.csv";
         }
     },
     
@@ -27,7 +27,7 @@ public enum RobotType {
         
         @Override
         public String getFilename() {
-            return "animalandia.csv";
+            return "output/animalandia.csv";
         }
     }, 
     
@@ -39,7 +39,7 @@ public enum RobotType {
         
         @Override
         public String getFilename() {
-            return "marketcan.csv";
+            return "output/marketcan.csv";
         }
     },
     
@@ -51,7 +51,7 @@ public enum RobotType {
         
         @Override
         public String getFilename() {
-            return "timoteo.csv";
+            return "output/timoteo.csv";
         }
     };
     
