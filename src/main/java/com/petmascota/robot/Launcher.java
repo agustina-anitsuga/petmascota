@@ -29,7 +29,7 @@ public class Launcher {
     public static void main(String[] args) {
     
         Launcher self = new Launcher();
-        self.run(RobotType.TIMOTEO);
+        self.run(RobotType.MARKETCAN);
     }
 
     /**
